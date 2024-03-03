@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+ <h2>Register Form</h2>
+ <p>Please fill in the fields</p>
+ <form method="post">
+    <!-- {% csrf_token %} -->
+    {{ form.non_field_errors }}
+    <div class="fieldWrapper">
+        {{ form.username.label_tag }} {{ form.username }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.email.label_tag }} {{ form.email }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.name.label_tag }} {{ form.name }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.role.label_tag }} {{ form.role }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.password.label_tag }} {{ form.password }}
+    </div>
+    <button type="submit">Register</button>
+ </form>
+{% endblock %}

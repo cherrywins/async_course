@@ -1,0 +1,5 @@
+source async/bin/activate
+eij75so8-4cbsf
+export PYTHONPATH=$PYTHONPATH:/Users/katerina/Projects/async_course/auth
+export DJANGO_SETTINGS_MODULE=auth.settings
+python -c "import sys; print(sys.path)"
