@@ -40,14 +40,21 @@ class AccountView(APIView):
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            if self.action == "create":
-                produce_create_event(serializer.data)
-            else:
-                if 'role' in serializer.validated_data:
-                    produce_role_changed_event(serializer.data)
-                produce_update_event(serializer.data)
-            return Response({"user": serializer.data}, status=status.HTTP_201_CREATED if self.action == "create" else status.HTTP_200_OK)
+            account = serializer.save()
+            produce_create_event(account)
+            return Response({"user": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, pk):
+        account = Account.objects.get(uuid=pk)
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(instance=account, data=request.data, partial=True)
+        if serializer.is_valid():
+            account = serializer.save()
+            if 'role' in serializer.validated_data:
+                produce_role_changed_event(account)
+            produce_update_event(account)
+            return Response({"user": serializer.data}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, pk):

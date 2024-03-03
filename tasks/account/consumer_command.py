@@ -14,7 +14,9 @@ def process_message(message):
             role=message['data']['role'],
         )
     elif message["event_name"] == "AccountUpdated":
-        account = Account.objects.get(uuid=message['data']['public_id'])
+        account = Account.objects.filter(uuid=message['data']['public_id']).first()
+        if not account:
+            account = Account(uuid=message['data']['public_id'])
         account.email=message['data']['email']
         account.name=message['data']['name']
         account.role=message['data']['role']
@@ -44,6 +46,7 @@ def consume_messages(topic_name):
     while n > 0:
         msg = c.poll(1.0)
         if msg is None:
+            n = n - 1
             continue
         if msg.error():
             raise KafkaException(msg.error())
