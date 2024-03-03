@@ -1,6 +1,7 @@
 from account.models import Account
 from rest_framework import serializers
 
+ROLES = ['admin', 'user', 'manager', 'it', 'worker', 'accountant']
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
@@ -10,8 +11,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         if Account.objects.filter(email=validated_data['email']).exists():
             raise serializers.ValidationError({'email': 'User with this email already exists'})
-        if validated_data['role'] not in ['admin', 'user', 'manager']:
-            raise serializers.ValidationError({'role': 'Role must be either admin or user or manager'})
+        if validated_data['role'] not in ROLES:
+            raise serializers.ValidationError({'role': 'Choose another role'})
         user = Account.objects.create_user(
             email=validated_data['email'],
             name=validated_data['name'],
@@ -35,13 +36,11 @@ class UserDetailSerializer(serializers.ModelSerializer):
     def validate_email(self, value):
         if Account.objects.filter(email=value).exists():
             raise serializers.ValidationError({'email': 'User with this email already exists'})
-    
-    def update(self, validated_data):
-        user = self.instance
-        
-        user.update(
-            email=validated_data['email'],
-            name=validated_data['name'],
-            role=validated_data['role'],
-        )
-        return user
+        return value
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        instance.name = validated_data.get('name', instance.name)
+        instance.role = validated_data.get('role', instance.role)
+        instance.save()
+        return instance

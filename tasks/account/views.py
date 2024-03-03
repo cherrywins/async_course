@@ -12,8 +12,6 @@ def get_account_info(token: str):
         'Content-Type': 'application/json' # This is common for APIs expecting JSON data
     }
     url = 'http://127.0.0.1:8000/account_info/'
-    print(url)
-    print(headers)
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:

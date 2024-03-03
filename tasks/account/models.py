@@ -7,7 +7,7 @@ class Account(models.Model):
     username = models.CharField(max_length=255, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True, unique=True)
     role = models.CharField(max_length=255, blank=True, null=True)
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid = models.UUIDField(required=True, editable=False, unique=True)
     token = models.CharField(max_length=255, blank=True, null=True)
     refresh_token = models.CharField(max_length=255, blank=True, null=True)
     
