@@ -1,1 +1,12 @@
 volumes/
+auth/auth/__pycache__/
+auth/account/__pycache__/
+tasks/account/__pycache__/
+tasks/task/__pycache__/
+tasks/tasks/__pycache__/
+tasks/tasks/bin/
+tasks/tasks/lib/
+tasks/tasks_env/
+auth/async/
+auth/auth/.fjfjf
+auth/jwt_auth/__pycache__/
