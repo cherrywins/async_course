@@ -10,3 +10,5 @@ tasks/tasks_env/
 auth/async/
 auth/auth/.fjfjf
 auth/jwt_auth/__pycache__/
+/__pycache__/
+__pycache__/
