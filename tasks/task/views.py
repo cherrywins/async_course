@@ -10,7 +10,8 @@ from task.models import Task
 from task.utils import reassign_tasks
 from .serializers import CreateTaskSerializer, TaskDetailSerializer
 from rest_framework.decorators import action
-
+import uuid
+from .producer import produce_task_assign_event, produce_task_create_event, produce_task_complete_event
     
 class TaskViewSet(viewsets.ViewSet):
     '''
@@ -47,15 +48,22 @@ class TaskViewSet(viewsets.ViewSet):
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            # if self.action == "create":
-            #     produce_create_event(serializer.data)
-            # else:
-            #     produce_update_event(serializer.data)
+            task = serializer.save()
+            produce_task_create_event(task) 
+            produce_task_assign_event(task)
             return Response(
                 {"task": serializer.data},
-                status=status.HTTP_201_CREATED if not 'pk' in self.kwargs else status.HTTP_200_OK
+                status=status.HTTP_201_CREATED
             )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, pk):
+        task = Account.objects.get(uuid=pk)
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(instance=task, data=request.data, partial=True)
+        if serializer.is_valid():
+            task = serializer.save()
+            return Response({"user": serializer.data}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=False, methods=["post"])
@@ -63,4 +71,14 @@ class TaskViewSet(viewsets.ViewSet):
         reassign_tasks()
         return Response({"message": "Tasks reassigned successfully."})
     
+    
+    @action(detail=True, methods=["post"])
+    def complete_task(self, request):
+        task: Task = self.get_object()
+        task.status = 'completed'
+        if not task.uuid:
+            task.uuid = uuid.uuid4()
+        task.save()
+        produce_task_complete_event(task)
+        return Response(status=status.HTTP_200_OK)
     

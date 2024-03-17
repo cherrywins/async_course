@@ -12,7 +12,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 class Account(AbstractUser):
     name = models.CharField(max_length=255, blank=True, null=True)
     role = models.CharField(max_length=255, blank=True, null=True)
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid = models.UUIDField(null=True, editable=False, unique=True)
 
     USERNAME_FIELD = 'uuid'
     

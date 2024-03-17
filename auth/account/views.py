@@ -1,21 +1,13 @@
-from django.shortcuts import render
-import jwt
-from django.contrib.auth import authenticate
 from account.models import Account
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework import viewsets
 
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from account.producer import produce_create_event, produce_delete_event, produce_role_changed_event, produce_update_event
+from account.producer import produce_create_event, produce_update_event
 from .serializers import CreateUserSerializer, UserDetailSerializer
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action
 
     
-class AccountView(APIView):
+class AccountViewSet(viewsets.ViewSet):
     '''
         /accounts
     '''
@@ -51,8 +43,6 @@ class AccountView(APIView):
         serializer = serializer_class(instance=account, data=request.data, partial=True)
         if serializer.is_valid():
             account = serializer.save()
-            if 'role' in serializer.validated_data:
-                produce_role_changed_event(account)
             produce_update_event(account)
             return Response({"user": serializer.data}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -60,5 +50,4 @@ class AccountView(APIView):
     def delete(self, request, pk):
         user = Account.objects.get(uuid=pk)
         user.delete()
-        produce_delete_event(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)

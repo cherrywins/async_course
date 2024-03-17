@@ -1,5 +1,9 @@
 from confluent_kafka import Producer
 import json
+import uuid
+import time
+from jsonschema import validate
+from .schemes import account_stream_schema_v2
 
 def produce_message(topic_name, message):
     p = Producer({'bootstrap.servers': 'localhost:9094'})
@@ -8,43 +12,36 @@ def produce_message(topic_name, message):
 
 def produce_create_event(account):
     event = {
-            'event_name': 'AccountCreated',
+            'metadata': {
+                'version': 2,
+                'event_name': 'AccountCreated',
+                'event_uuid': uuid.uuid4(),
+                'timestamp': time.time()
+            },
             'data': {
-                'public_id': str(account.uuid),
+                'account_id': str(account.uuid),
                 'email': account.email,
                 'name': account.name,
                 'role': account.role,
             }
         }
+    validate(event, account_stream_schema_v2)
     produce_message('accounts-stream', event)
 
 def produce_update_event(account):
     event = {
-            'event_name': 'AccountUpdated',
+            'metadata': {
+                'version': 2,
+                'event_name': 'AccountUpdated',
+                'event_uuid': uuid.uuid4(),
+                'timestamp': time.time()
+            },
             'data': {
-                'public_id': str(account.uuid),
+                'account_id': str(account.uuid),
                 'email': account.email,
                 'name': account.name,
                 'role': account.role,
             }
         }
-    produce_message('accounts-stream', event)    
-
-def produce_delete_event(uuid):
-    event = {
-            'event_name': 'AccountDeleted',
-            'data': {
-                'public_id': str(uuid),
-            }
-        }
-    produce_message('accounts-stream', event)    
-
-def produce_role_changed_event(account):
-    event = {
-            'event_name': 'AccountRoleChanged',
-            'data': {
-                'public_id': str(account.uuid),
-                'role': account.role,
-            }
-        }
-    produce_message('accounts', event)
+    validate(event, account_stream_schema_v2)
+    produce_message('accounts-stream', event)
