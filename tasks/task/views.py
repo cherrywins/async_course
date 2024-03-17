@@ -49,7 +49,7 @@ class TaskViewSet(viewsets.ViewSet):
         serializer = serializer_class(data=request.data)
         if serializer.is_valid():
             task = serializer.save()
-            produce_task_create_event(task)
+            produce_task_create_event(task) 
             produce_task_assign_event(task)
             return Response(
                 {"task": serializer.data},

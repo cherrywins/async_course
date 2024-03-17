@@ -12,3 +12,4 @@ auth/auth/.fjfjf
 auth/jwt_auth/__pycache__/
 /__pycache__/
 __pycache__/
+.venv

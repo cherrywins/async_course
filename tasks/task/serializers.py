@@ -13,7 +13,7 @@ class CreateTaskSerializer(serializers.ModelSerializer):
         task = Task.objects.create(
             description=validated_data['description'],
             assignee_id=int(random.choice(assignee_ids)),
-            status='assigned'
+            status='assigned', 
         )
         return task
     

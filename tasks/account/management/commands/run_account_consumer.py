@@ -3,9 +3,9 @@ import subprocess
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import autoreload
+from tasks.account.consumer import consume_messages
 import logging
 log = logging.getLogger('cron')
-from tasks.account.consumer import consume_messages
 
 class Command(BaseCommand):
     command_name = 'consume topic messages'
